@@ -94,6 +94,7 @@ Shader "UI/Hidden/UI-EffectCapture"
 				half4 color = Tex2DBlurring1D(_MainTex, IN.uv, blurFactor * _MainTex_TexelSize.xy * 2);
 				// color.a = (color.r + color.g + color.b) * 0.333;
 				// color.a = 0.5;
+				color.a = 0.3;
 				return color;
 			}
 		ENDCG

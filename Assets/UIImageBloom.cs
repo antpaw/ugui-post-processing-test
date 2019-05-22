@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
 
-public class UIImageBloom : RawImage
+public class UIImageBloom : MonoBehaviour
 {
     public enum DesamplingRate
     {
@@ -15,6 +15,7 @@ public class UIImageBloom : RawImage
         x4 = 4,
         x8 = 8,
     }
+    public RawImage rawImage;
     public RenderTexture capturedTexture { get { return _rt; } }
 
     [Tooltip("Desampling rate of the generated RenderTexture.")]
@@ -25,13 +26,14 @@ public class UIImageBloom : RawImage
 
     static int s_CopyId;
     static CommandBuffer s_CommandBuffer;
-    static int s_EffectId1;
 
     RenderTargetIdentifier _rtId;
     RenderTexture _rt;
 
-    void Start()
+    void OnEnable()
     {
+        int s_EffectId1 = Shader.PropertyToID("_UIEffectCapturedImage_EffectId1");
+
         int w, h;
         GetDesamplingSize(m_DesamplingRate, out w, out h);
         s_CommandBuffer = new CommandBuffer();
@@ -50,9 +52,8 @@ public class UIImageBloom : RawImage
         Graphics.ExecuteCommandBuffer(s_CommandBuffer);
 #endif
         _Release(false);
-        texture = capturedTexture;
+        rawImage.texture = capturedTexture;
         _SetDirty();
-
     }
 
     void Update()
@@ -97,7 +98,7 @@ public class UIImageBloom : RawImage
     {
         if (releaseRT)
         {
-            texture = null;
+            rawImage.texture = null;
             _Release(ref _rt);
         }
 

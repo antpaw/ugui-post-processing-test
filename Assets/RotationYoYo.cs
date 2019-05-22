@@ -19,4 +19,5 @@ public class RotationYoYo : MonoBehaviour
     {
         transform.Rotate(xAngle, yAngle, zAngle, Space.World);
     }
+
 }
