@@ -16,7 +16,7 @@ public class UIImageBloom : MonoBehaviour
         x8 = 8,
     }
     public RawImage rawImage;
-    public RenderTexture capturedTexture { get { return _rt; } }
+    public Material m_EffectMaterial;
 
     [Tooltip("Desampling rate of the generated RenderTexture.")]
     [SerializeField] DesamplingRate m_DesamplingRate = DesamplingRate.x1;
@@ -24,15 +24,67 @@ public class UIImageBloom : MonoBehaviour
     [Tooltip("FilterMode for capturing.")]
     [SerializeField] FilterMode m_FilterMode = FilterMode.Bilinear;
 
-    static int s_CopyId;
     static CommandBuffer s_CommandBuffer;
 
     RenderTargetIdentifier _rtId;
     RenderTexture _rt;
+    private RenderTexture capturedScreenRenderTexture;
+
+    void Awake()
+    {
+#if UNITY_EDITOR
+        capturedScreenRenderTexture = Resources.FindObjectsOfTypeAll<RenderTexture>().FirstOrDefault(x => x.name == "GameView RT");
+#else
+        capturedScreenRenderTexture = BuiltinRenderTextureType.BindableTexture;
+#endif
+    }
 
     void OnEnable()
+    // void Update()
     {
+        int w, h;
+        GetDesamplingSize(m_DesamplingRate, out w, out h);
+        if (_rt && (_rt.width != w || _rt.height != h))
+        {
+            _Release(ref _rt);
+        }
+
+        if (_rt == null)
+        {
+            _rt = RenderTexture.GetTemporary(w, h, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Default);
+            _rt.filterMode = m_FilterMode;
+            _rt.useMipMap = false;
+            _rt.wrapMode = TextureWrapMode.Clamp;
+            _rtId = new RenderTargetIdentifier(_rt);
+        }
+
+        s_CommandBuffer = new CommandBuffer();
+        s_CommandBuffer.Blit(capturedScreenRenderTexture, _rtId, m_EffectMaterial);
+        // s_CommandBuffer.ReleaseTemporaryRT(capturedScreenRenderTexture);
+        Graphics.ExecuteCommandBuffer(s_CommandBuffer);
+
+        rawImage.texture = _rt;
+
+        /*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         int s_EffectId1 = Shader.PropertyToID("_UIEffectCapturedImage_EffectId1");
+
+        int s_CopyId = Shader.PropertyToID("_UIEffectCapturedImage_ScreenCopyId");
 
         int w, h;
         GetDesamplingSize(m_DesamplingRate, out w, out h);
@@ -43,22 +95,15 @@ public class UIImageBloom : MonoBehaviour
 #else
         s_CommandBuffer.Blit(BuiltinRenderTextureType.BindableTexture, s_CopyId);
 #endif
+        s_CommandBuffer.GetTemporaryRT(s_EffectId1, w, h, 0, m_FilterMode);
+        s_CommandBuffer.Blit(s_CopyId, s_EffectId1, m_EffectMaterial, 0);
+        s_CommandBuffer.ReleaseTemporaryRT(s_CopyId);
 
-        s_CommandBuffer.Blit(s_EffectId1, _rtId);
-        s_CommandBuffer.ReleaseTemporaryRT(s_EffectId1);
-
-#if !UNITY_EDITOR
-        // Execute command buffer.
         Graphics.ExecuteCommandBuffer(s_CommandBuffer);
-#endif
         _Release(false);
         rawImage.texture = capturedTexture;
         _SetDirty();
-    }
-
-    void Update()
-    {
-
+        */
     }
 
     // 1:1 COPY
@@ -124,8 +169,7 @@ public class UIImageBloom : MonoBehaviour
         }
     }
 
-    [System.Diagnostics.Conditional("UNITY_EDITOR")]
-    void _SetDirty()
+    [System.Diagnostics.Conditional("UNITY_EDITOR")] void _SetDirty()
     {
 #if UNITY_EDITOR
         if (!Application.isPlaying)
@@ -134,5 +178,4 @@ public class UIImageBloom : MonoBehaviour
         }
 #endif
     }
-
 }
