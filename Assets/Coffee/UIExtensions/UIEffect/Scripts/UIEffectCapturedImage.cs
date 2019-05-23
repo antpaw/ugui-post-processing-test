@@ -442,8 +442,7 @@ namespace Coffee.UIExtensions
         /// <summary>
         /// Raises the before serialize event.
         /// </summary>
-        public void OnBeforeSerialize()
-        { }
+        public void OnBeforeSerialize() { }
 
         /// <summary>
         /// Raises the after deserialize event.

@@ -264,8 +264,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rawImage: {fileID: 359481218}
-  m_EffectMaterial: {fileID: 2100000, guid: 1a1a8e44196ca754a9a7b9cb80e17573, type: 2}
-  m_DesamplingRate: 1
+  m_EffectMaterial: {fileID: 2100000, guid: 63900c5185f6642d585d8ad18a1bd1cd, type: 2}
+  m_DesamplingRate: 0
   m_FilterMode: 1
 --- !u!222 &359481217
 CanvasRenderer:
@@ -289,7 +289,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -840,7 +840,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1443287839
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1002,7 +1002,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1457868321}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1089678213}
+        m_MethodName: OnClick
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &1457868321
@@ -1209,6 +1220,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1637037550}
   - component: {fileID: 1637037551}
+  - component: {fileID: 1637037552}
   m_Layer: 5
   m_Name: RawImage (1)
   m_TagString: Untagged
@@ -1243,6 +1255,49 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1637037549}
   m_CullTransparentMesh: 0
+--- !u!114 &1637037552
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1637037549}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e96dacbf1b116f64da658fbad66839e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 0
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
+      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  m_Texture: {fileID: 0}
+  m_UVRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 1
+    height: 1
+  m_EffectFactor: 1
+  m_ColorFactor: 1
+  m_BlurFactor: 1
+  m_EffectMode: 0
+  m_ColorMode: 0
+  m_BlurMode: 1
+  m_EffectColor: {r: 1, g: 1, b: 1, a: 1}
+  m_DesamplingRate: 1
+  m_ReductionRate: 1
+  m_FilterMode: 1
+  m_EffectMaterial: {fileID: 21468731017049312, guid: 1a1a8e44196ca754a9a7b9cb80e17573,
+    type: 2}
+  m_BlurIterations: 3
+  m_FitToScreen: 1
+  m_CaptureOnEnable: 0
+  m_ImmediateCapturing: 1
 --- !u!1 &2072607812
 GameObject:
   m_ObjectHideFlags: 0
