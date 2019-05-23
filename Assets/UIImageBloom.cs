@@ -30,18 +30,17 @@ public class UIImageBloom : MonoBehaviour
     RenderTexture _rt;
     private RenderTexture capturedScreenRenderTexture;
 
-    void Awake()
+    void Awake() { }
+
+    void OnEnable()
+    //    void Update()
     {
 #if UNITY_EDITOR
         capturedScreenRenderTexture = Resources.FindObjectsOfTypeAll<RenderTexture>().FirstOrDefault(x => x.name == "GameView RT");
 #else
         capturedScreenRenderTexture = BuiltinRenderTextureType.BindableTexture;
 #endif
-    }
 
-    void OnEnable()
-    // void Update()
-    {
         int w, h;
         GetDesamplingSize(m_DesamplingRate, out w, out h);
         if (_rt && (_rt.width != w || _rt.height != h))
@@ -53,7 +52,7 @@ public class UIImageBloom : MonoBehaviour
         {
             _rt = RenderTexture.GetTemporary(w, h, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Default);
             _rt.filterMode = m_FilterMode;
-            _rt.useMipMap = false;
+            // _rt.useMipMap = false;
             _rt.wrapMode = TextureWrapMode.Clamp;
             _rtId = new RenderTargetIdentifier(_rt);
         }

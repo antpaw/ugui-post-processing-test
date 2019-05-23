@@ -4,7 +4,7 @@ Shader "UI/Hidden/UI-Effect"
 	{
 		[PerRendererData] _MainTex ("Main Texture", 2D) = "white" {}
 		_Color ("Tint", Color) = (1,1,1,1)
-		
+
 		_StencilComp ("Stencil Comparison", Float) = 8
 		_Stencil ("Stencil ID", Float) = 0
 		_StencilOp ("Stencil Operation", Float) = 0
@@ -21,19 +21,19 @@ Shader "UI/Hidden/UI-Effect"
 	SubShader
 	{
 		Tags
-		{ 
-			"Queue"="Transparent" 
-			"IgnoreProjector"="True" 
-			"RenderType"="Transparent" 
+		{
+			"Queue"="Transparent"
+			"IgnoreProjector"="True"
+			"RenderType"="Transparent"
 			"PreviewType"="Plane"
 			"CanUseSpriteAtlas"="True"
 		}
-		
+
 		Stencil
 		{
 			Ref [_Stencil]
 			Comp [_StencilComp]
-			Pass [_StencilOp] 
+			Pass [_StencilOp]
 			ReadMask [_StencilReadMask]
 			WriteMask [_StencilWriteMask]
 		}
@@ -57,10 +57,10 @@ Shader "UI/Hidden/UI-Effect"
 			#else
 			#pragma target 3.0
 			#endif
-			
+
 			#pragma multi_compile __ UNITY_UI_ALPHACLIP
 
-			#pragma shader_feature __ GRAYSCALE SEPIA NEGA PIXEL 
+			#pragma shader_feature __ GRAYSCALE SEPIA NEGA PIXEL
 			#pragma shader_feature __ ADD SUBTRACT FILL
 			#pragma shader_feature __ FASTBLUR MEDIUMBLUR DETAILBLUR
 			#pragma shader_feature __ EX
@@ -95,13 +95,13 @@ Shader "UI/Hidden/UI-Effect"
 				half4 uvMask : TEXCOORD3;
 				#endif
 			};
-			
+
 			fixed4 _Color;
 			fixed4 _TextureSampleAdd;
 			float4 _ClipRect;
 			sampler2D _MainTex;
 			float4 _MainTex_TexelSize;
-			
+
 			v2f vert(appdata_t IN)
 			{
 				v2f OUT;
@@ -120,7 +120,7 @@ Shader "UI/Hidden/UI-Effect"
 				OUT.uvMask.xy = UnpackToVec2(IN.uvMask.x);
 				OUT.uvMask.zw = UnpackToVec2(IN.uvMask.y);
 				#endif
-				
+
 				return OUT;
 			}
 

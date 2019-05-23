@@ -48,56 +48,13 @@ Shader "UI/Hidden/UI-EffectCapture"
 				half effectFactor = _EffectFactor.x;
 				fixed4 colorFactor = _ColorFactor;
 
-				#if PIXEL
-				half2 pixelScale = max(2, (1 - effectFactor) * _MainTex_TexelSize.zw);
-				IN.uv = round(IN.uv * pixelScale) / pixelScale;
-				#endif
-
 				half4 color = tex2D(_MainTex, IN.uv);
 
-				#if defined (UI_TONE)
-				color = ApplyToneEffect(color, effectFactor);
-				#endif
-
-				#if defined (UI_COLOR)
-				color = ApplyColorEffect(color, colorFactor);
-				#endif
-
 				color.a = 1;
-				return color;
+				return color;// * fixed4(0.4, 0.6, 1, 1);
 			}
 		ENDCG
 		}
 
-
-		Pass
-		{
-			Name "Effect-Blur"
-
-		CGPROGRAM
-			#pragma vertex vert_img
-			#pragma fragment frag_blur
-			#pragma target 2.0
-
-			#pragma shader_feature __ FASTBLUR MEDIUMBLUR DETAILBLUR
-
-			#include "UnityCG.cginc"
-			#include "UI-Effect.cginc"
-
-			sampler2D _MainTex;
-			float4 _MainTex_TexelSize;
-			half4 _EffectFactor;
-
-			fixed4 frag_blur(v2f_img IN) : SV_Target
-			{
-				half2 blurFactor = _EffectFactor.xy;
-				half4 color = Tex2DBlurring1D(_MainTex, IN.uv, blurFactor * _MainTex_TexelSize.xy * 2);
-				// color.a = (color.r + color.g + color.b) * 0.333;
-				// color.a = 0.5;
-				color.a = 0.3;
-				return color;
-			}
-		ENDCG
-		}
 	}
 }

@@ -209,9 +209,11 @@ namespace Coffee.UIExtensions
         /// <summary>
         /// This function is called when the object becomes enabled and active.
         /// </summary>
+        private RenderTexture capturedScreenRenderTexture;
         protected override void OnEnable()
         {
             base.OnEnable();
+
             if (m_CaptureOnEnable && Application.isPlaying)
             {
                 Capture();
@@ -302,16 +304,11 @@ namespace Coffee.UIExtensions
         /// </summary>
         public void Capture()
         {
-            // Fit to screen.
-            var rootCanvas = canvas.rootCanvas;
-            if (m_FitToScreen)
-            {
-                var rootTransform = rootCanvas.transform as RectTransform;
-                var size = rootTransform.rect.size;
-                rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, size.x);
-                rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, size.y);
-                rectTransform.position = rootTransform.position;
-            }
+#if UNITY_EDITOR
+            capturedScreenRenderTexture = Resources.FindObjectsOfTypeAll<RenderTexture>().FirstOrDefault(x => x.name == "GameView RT");
+#else
+            capturedScreenRenderTexture = BuiltinRenderTextureType.BindableTexture;
+#endif
 
             // Cache some ids.
             if (s_CopyId == 0)
@@ -336,86 +333,24 @@ namespace Coffee.UIExtensions
             // Generate RT for result.
             if (_rt == null)
             {
-                _rt = RenderTexture.GetTemporary(w, h, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Default);
+                _rt = RenderTexture.GetTemporary(w, h, 0, RenderTextureFormat.DefaultHDR, RenderTextureReadWrite.Default);
                 _rt.filterMode = m_FilterMode;
                 _rt.useMipMap = false;
                 _rt.wrapMode = TextureWrapMode.Clamp;
                 _rtId = new RenderTargetIdentifier(_rt);
             }
-            SetupCommandBuffer();
-        }
-
-        void SetupCommandBuffer()
-        {
-            // Material for effect.
-            Material mat = m_EffectMaterial;
 
             if (s_CommandBuffer == null)
             {
                 s_CommandBuffer = new CommandBuffer();
             }
 
-            // [1] Capture from back buffer (back buffer -> copied screen).
-            int w, h;
-            GetDesamplingSize(DesamplingRate.None, out w, out h);
-            s_CommandBuffer.GetTemporaryRT(s_CopyId, w, h, 0, m_FilterMode);
-#if UNITY_EDITOR
-            s_CommandBuffer.Blit(Resources.FindObjectsOfTypeAll<RenderTexture>().FirstOrDefault(x => x.name == "GameView RT"), s_CopyId);
-#else
-            s_CommandBuffer.Blit(BuiltinRenderTextureType.BindableTexture, s_CopyId);
-#endif
+            s_CommandBuffer.Blit(capturedScreenRenderTexture, _rtId, m_EffectMaterial, 0);
 
-            // Set properties for effect.
-            s_CommandBuffer.SetGlobalVector(s_EffectFactorId, new Vector4(m_EffectFactor, 0));
-            s_CommandBuffer.SetGlobalVector(s_ColorFactorId, new Vector4(m_EffectColor.r, m_EffectColor.g, m_EffectColor.b, m_EffectColor.a));
+            Graphics.ExecuteCommandBuffer(s_CommandBuffer);
 
-            // [2] Apply base effect with reduction buffer (copied screen -> effect1).
-            GetDesamplingSize(m_ReductionRate, out w, out h);
-            s_CommandBuffer.GetTemporaryRT(s_EffectId1, w, h, 0, m_FilterMode);
-            s_CommandBuffer.Blit(s_CopyId, s_EffectId1, mat, 0);
-            s_CommandBuffer.ReleaseTemporaryRT(s_CopyId);
-
-            // Iterate blurring operation.
-            if (m_BlurMode != BlurMode.None)
-            {
-                s_CommandBuffer.GetTemporaryRT(s_EffectId2, w, h, 0, m_FilterMode);
-                for (int i = 0; i < m_BlurIterations; i++)
-                {
-                    // [3] Apply blurring with reduction buffer (effect1 -> effect2, or effect2 -> effect1).
-                    s_CommandBuffer.SetGlobalVector(s_EffectFactorId, new Vector4(m_BlurFactor, 0));
-                    s_CommandBuffer.Blit(s_EffectId1, s_EffectId2, mat, 1);
-                    s_CommandBuffer.SetGlobalVector(s_EffectFactorId, new Vector4(0, m_BlurFactor));
-                    s_CommandBuffer.Blit(s_EffectId2, s_EffectId1, mat, 1);
-                }
-                s_CommandBuffer.ReleaseTemporaryRT(s_EffectId2);
-            }
-
-            // [4] Copy to result RT.
-            s_CommandBuffer.Blit(s_EffectId1, _rtId);
-            s_CommandBuffer.ReleaseTemporaryRT(s_EffectId1);
-
-#if UNITY_EDITOR
-            if (!Application.isPlaying)
-            {
-                Graphics.ExecuteCommandBuffer(s_CommandBuffer);
-
-                UpdateTexture();
-                return;
-            }
-            else
-            {
-                Graphics.ExecuteCommandBuffer(s_CommandBuffer);
-            }
-#endif
-            if (m_ImmediateCapturing)
-            {
-                UpdateTexture();
-            }
-            else
-            {
-                // Execute command buffer.
-                canvas.rootCanvas.GetComponent<CanvasScaler>().StartCoroutine(_CoUpdateTextureOnNextFrame());
-            }
+            _Release(false);
+            texture = capturedTexture;
         }
 
         /// <summary>
