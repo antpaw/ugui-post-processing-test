@@ -1289,12 +1289,12 @@ MonoBehaviour:
   m_ColorMode: 0
   m_BlurMode: 1
   m_EffectColor: {r: 1, g: 1, b: 1, a: 1}
-  m_DesamplingRate: 1
-  m_ReductionRate: 1
+  m_DesamplingRate: 2
+  m_ReductionRate: 2
   m_FilterMode: 1
   m_EffectMaterial: {fileID: 21468731017049312, guid: 1a1a8e44196ca754a9a7b9cb80e17573,
     type: 2}
-  m_BlurIterations: 3
+  m_BlurIterations: 2
   m_FitToScreen: 1
   m_CaptureOnEnable: 0
   m_ImmediateCapturing: 1

@@ -59,8 +59,7 @@ public class UIImageBloom : MonoBehaviour
         }
 
         s_CommandBuffer = new CommandBuffer();
-        s_CommandBuffer.Blit(capturedScreenRenderTexture, _rtId);
-        // s_CommandBuffer.Blit(capturedScreenRenderTexture, _rtId, m_EffectMaterial);
+        s_CommandBuffer.Blit(capturedScreenRenderTexture, _rtId, m_EffectMaterial, 0);
         // s_CommandBuffer.ReleaseTemporaryRT(capturedScreenRenderTexture);
         Graphics.ExecuteCommandBuffer(s_CommandBuffer);
 

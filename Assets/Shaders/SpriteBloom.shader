@@ -1,25 +1,19 @@
 Shader "Hidden/antpaw/SpriteBloom"{
-	Properties{
-		_Color ("Tint", Color) = (0, 0, 0, 1)
-		_MainTex ("Texture", 2D) = "white" {}
+	Properties
+	{
+		[PerRendererData] _MainTex("Main Texture", 2D) = "white" {}
 	}
 
-	SubShader{
-		Tags{
-			"RenderType"="Transparent"
-			"Queue"="Transparent"
-			"IgnoreProjector"="True"
-			"RenderType"="Transparent"
-			"PreviewType"="Plane"
-			"CanUseSpriteAtlas"="True"
-		}
+	SubShader
+	{
+		ZTest Always
+		Cull Off
+		ZWrite Off
+		Fog{ Mode off }
 
-		Blend SrcAlpha OneMinusSrcAlpha
-
-		ZWrite off
-		Cull off
 
 		Pass{
+			Name "Effect-Base"
 
 			CGPROGRAM
 
@@ -52,6 +46,9 @@ Shader "Hidden/antpaw/SpriteBloom"{
 
                 o.position = UnityObjectToClipPos(v.vertex);
                 o.uv = UnityStereoScreenSpaceUVAdjust(v.uv, _MainTex_ST);
+				#if UNITY_UV_STARTS_AT_TOP
+				o.uv.y = 1 - o.uv.y;
+				#endif
 
 				o.color = v.color;
 				return o;
